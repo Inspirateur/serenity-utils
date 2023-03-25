@@ -1,0 +1,24 @@
+[package]
+name = "serenity-utils"
+version = "0.1.0"
+edition = "2021"
+description = "A collection of utilities that I often need when using Serenity to make discord bot."
+license = "Unlicense"
+repository = "https://github.com/Inspirateur/serenity-utils"
+keywords = ["discord", "bot", "utility", "serenity", "utils"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serenity = { version = "*", default-features = false, features = [
+	"cache",
+	"model",
+	"builder",
+	"client",
+	"gateway",
+	"http",
+	"utils",
+	"rustls_backend",
+] }
+anyhow = "*"
+rusqlite = "*"
