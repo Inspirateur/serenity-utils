@@ -47,7 +47,7 @@ impl DBMap {
         let conn = Connection::open(&self.path)?;
         let key = key.to_string();
         let mut stmt = conn
-        .prepare("SELECT value FROM Vote WHERE key = ?1")
+        .prepare("SELECT value FROM Map WHERE key = ?1")
         .unwrap();
         let values = stmt
             .query_map([key], |row| {
