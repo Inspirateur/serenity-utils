@@ -12,7 +12,7 @@ impl DBMap {
         conn.execute(
             "CREATE TABLE IF NOT EXISTS Map (
                 key TEXT PRIMARY KEY,
-                value TEXT,
+                value TEXT
             )",
             [],
         )?;
