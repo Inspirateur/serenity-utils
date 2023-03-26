@@ -27,33 +27,23 @@ impl DBMap {
         let key = key.to_string();
         let value = value.to_string();
         conn.execute(
-            "INSERT INTO Map (key, value)
+            "INSERT OR REPLACE INTO Map (key, value)
             VALUES (?1, ?2)", 
             [key, value]
         )?;
         Ok(())
     }
 
-    pub fn get_single<S: ToString>(&self, key: S) -> Result<String> {
-        let mut values = self.get(key)?;
-        if values.len() != 1 {
-            bail!("Got {} results with DBMap.get_single (expected 1)", values.len());
-        }
-        let value = values.pop().unwrap();
-        Ok(value)
-    }
-
-    pub fn get<S: ToString>(&self, key: S) -> Result<Vec<String>> {
+    pub fn get<S: ToString>(&self, key: S) -> Result<String> {
         let conn = Connection::open(&self.path)?;
         let key = key.to_string();
         let mut stmt = conn
-        .prepare("SELECT value FROM Map WHERE key = ?1")
-        .unwrap();
-        let values = stmt
-            .query_map([key], |row| {
+            .prepare("SELECT value FROM Map WHERE key = ?1")
+            .unwrap();
+        let value = stmt
+            .query_row([key], |row| {
                 row.get::<usize, String>(0)
-            })?
-            .collect::<Result<Vec<String>, rusqlite::Error>>()?;
-        Ok(values)
+            })?;
+        Ok(value)
     }
 }
