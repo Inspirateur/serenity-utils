@@ -1,15 +1,15 @@
-use std::marker::PhantomData;
+use std::{marker::PhantomData};
 use rusqlite::Connection;
-use anyhow::Result;
+use anyhow::{Result, Error};
 
 #[derive(Debug, Clone)]
-pub struct DBMap<K: ToString + From<String>, V: ToString + From<String>> {
+pub struct DBMap<K: ToString + TryFrom<String, Error = Error>, V: ToString + TryFrom<String, Error = Error>> {
     path: String,
     key_type: PhantomData<K>,
     value_type: PhantomData<V>
 }
 
-impl<K: ToString + From<String>, V: ToString + From<String>> DBMap<K, V> {
+impl<K: ToString + TryFrom<String, Error = Error>, V: ToString + TryFrom<String, Error = Error>> DBMap<K, V> {
     pub fn new(db_path: &str) -> Result<Self> {
         let conn = Connection::open(db_path)?;
         conn.execute(
@@ -47,8 +47,9 @@ impl<K: ToString + From<String>, V: ToString + From<String>> DBMap<K, V> {
         let value = stmt
             .query_row([key], |row| {
                 row.get::<usize, String>(0)
-            })?;
-        Ok(value.into())
+            })?.try_into()?;
+        
+        Ok(value)
     }
 
     pub fn get_keys(&self, value: V) -> Result<Vec<K>> {
@@ -62,6 +63,6 @@ impl<K: ToString + From<String>, V: ToString + From<String>> DBMap<K, V> {
                 row.get::<usize, String>(0)
             })?
             .collect::<Result<Vec<String>, rusqlite::Error>>()?;
-        Ok(values.into_iter().map(String::into).collect())
+        Ok(values.into_iter().map(K::try_from).collect::<Result<Vec<K>>>()?)
     }
 }
