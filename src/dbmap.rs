@@ -1,5 +1,5 @@
 use rusqlite::{Connection};
-use anyhow::{Result, bail};
+use anyhow::Result;
 
 #[derive(Debug, Clone)]
 pub struct DBMap {
