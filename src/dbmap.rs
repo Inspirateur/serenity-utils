@@ -5,8 +5,8 @@ use anyhow::Result;
 #[derive(Debug, Clone)]
 pub struct DBMap<K: ToSql + FromSql, V: ToSql + FromSql> {
     path: String,
-    key_type: PhantomData<*const K>,
-    value_type: PhantomData<*const V>
+    key_type: PhantomData<K>,
+    value_type: PhantomData<V>
 }
 
 impl<K: ToSql + FromSql, V: ToSql + FromSql> DBMap<K, V> {

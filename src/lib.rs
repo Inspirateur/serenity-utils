@@ -9,8 +9,11 @@ pub use utils::*;
 mod tests {
     use crate::*;
 
+    fn is_sync<T: Sync>() { }
+
     #[test]
     fn it_works() {
+        is_sync::<DBMap<String, u64>>();
         let db_map: DBMap<String, u64> = DBMap::new("db_map.db").unwrap();
         db_map.insert("Test".to_string(), 42).unwrap();
         db_map.insert("Hello".to_string(), 1).unwrap();
