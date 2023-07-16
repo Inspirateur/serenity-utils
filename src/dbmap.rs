@@ -3,13 +3,13 @@ use rusqlite::{Connection, params, ToSql, types::FromSql};
 use anyhow::Result;
 
 #[derive(Debug, Clone)]
-pub struct DBMap<K: ToSql + FromSql, V: ToSql + FromSql> {
+pub struct DBMap<K, V> {
     path: String,
     key_type: PhantomData<K>,
     value_type: PhantomData<V>
 }
 
-impl<K: ToSql + FromSql, V: ToSql + FromSql> DBMap<K, V> {
+impl<K, V> DBMap<K, V> {
     pub fn new(db_path: &str) -> Result<Self> {
         let conn = Connection::open(db_path)?;
         conn.execute(
@@ -25,7 +25,9 @@ impl<K: ToSql + FromSql, V: ToSql + FromSql> DBMap<K, V> {
             value_type: PhantomData
         })
     }
+}
 
+impl<K: ToSql, V: ToSql> DBMap<K, V> {
     pub fn insert(&self, key: K, value: V) -> Result<()> {
         let conn = Connection::open(&self.path)?;
         conn.execute(
@@ -35,7 +37,9 @@ impl<K: ToSql + FromSql, V: ToSql + FromSql> DBMap<K, V> {
         )?;
         Ok(())
     }
+}
 
+impl<K: ToSql, V: FromSql> DBMap<K, V> {
     pub fn get(&self, key: K) -> Result<V> {
         let conn = Connection::open(&self.path)?;
         let mut stmt = conn
@@ -47,7 +51,9 @@ impl<K: ToSql + FromSql, V: ToSql + FromSql> DBMap<K, V> {
             })?;
         Ok(value)
     }
+}
 
+impl<K: FromSql, V: ToSql> DBMap<K, V> {
     pub fn get_keys(&self, value: V) -> Result<Vec<K>> {
         let conn = Connection::open(&self.path)?;
         let mut stmt = conn
