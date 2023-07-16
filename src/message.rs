@@ -19,6 +19,10 @@ pub struct MessageBuilder {
 }
 
 impl MessageBuilder {
+    pub fn new<S: ToString>(content: S) -> Self {
+        MessageBuilder { content: content.to_string(), ..Default::default() }
+    }
+
     pub fn content<S: ToString>(mut self, content: S) -> Self {
         self.content = content.to_string();
         self
