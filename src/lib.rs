@@ -3,7 +3,7 @@ mod bot;
 mod utils;
 mod dbmap;
 pub use dbmap::*;
-pub use message::MessageBuilder;
+pub use message::*;
 pub use bot::*;
 pub use utils::*;
 
