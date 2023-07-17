@@ -30,6 +30,7 @@ impl Bot for Http {
                 response
                     .kind(ChannelMessageWithSource)
                     .interaction_response_data(|answer| {
+                        answer.allowed_mentions(|mentions| mentions.empty_users());
                         answer.content(message.content);
                         message.files.iter().for_each(|Attachment { file, filename }| {
                             answer.add_file((file.as_slice(), filename.as_str()));
@@ -62,6 +63,7 @@ impl Bot for Http {
     async fn followup(&self, command: &Command, message: MessageBuilder) -> Result<()> {
         (command
             .create_followup_message(self, |answer| {
+                answer.allowed_mentions(|mentions| mentions.empty_users());
                 answer.content(message.content);
                 message.files.iter().for_each(|Attachment { file, filename }| {
                     answer.add_file((file.as_slice(), filename.as_str()));
@@ -94,6 +96,7 @@ impl Bot for Http {
         Ok(
             (channel_id.send_message(
                 &self, |answer| {
+                    answer.allowed_mentions(|mentions| mentions.empty_users());
                     answer.content(message.content);
                     message.files.iter().for_each(|Attachment { file, filename }| {
                         answer.add_file((file.as_slice(), filename.as_str()));
