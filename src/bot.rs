@@ -14,7 +14,7 @@ use crate::{message::{MessageBuilder, Attachment}, MessageUtil};
 type Command = ApplicationCommandInteraction;
 
 #[async_trait]
-pub trait Bot {
+pub trait BotUtil {
     async fn answer(&self, command: &Command, message: MessageBuilder) -> Result<Message>;
 
     async fn edit_response(&self, command: &Command, message: MessageBuilder) -> Result<()>;
@@ -25,7 +25,7 @@ pub trait Bot {
 }
 
 #[async_trait]
-impl Bot for Http {
+impl BotUtil for Http {
     async fn answer(&self, command: &Command, message: MessageBuilder) -> Result<Message> {
         (command
             .create_interaction_response(self, |response| {
