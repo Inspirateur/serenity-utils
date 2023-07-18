@@ -5,17 +5,19 @@ use serenity::{
     model::{
         application::interaction::{
             application_command::ApplicationCommandInteraction,
-            InteractionResponseType::ChannelMessageWithSource,
+            InteractionResponseType::{ChannelMessageWithSource, UpdateMessage},
         },
         prelude::{ChannelId, Message},
     },
 };
-use crate::message::{MessageBuilder, Attachment};
+use crate::{message::{MessageBuilder, Attachment}, MessageUtil};
 type Command = ApplicationCommandInteraction;
 
 #[async_trait]
 pub trait Bot {
     async fn answer(&self, command: &Command, message: MessageBuilder) -> Result<Message>;
+
+    async fn edit_response(&self, command: &Command, message: MessageBuilder) -> Result<()>;
 
     async fn followup(&self, command: &Command, message: MessageBuilder) -> Result<()>;
 
@@ -35,29 +37,30 @@ impl Bot for Http {
                         message.files.iter().for_each(|Attachment { file, filename }| {
                             answer.add_file((file.as_slice(), filename.as_str()));
                         });
-                        if message.buttons.len() > 0 {
-                            answer.components(
-                                |components| components.create_action_row(
-                                    |action_row|  {
-                                        for button in message.buttons {
-                                            action_row.create_button(
-                                                |b| b
-                                                    .custom_id(button.custom_id)
-                                                    .style(button.style)
-                                                    .label(button.label)
-                                            );
-                                        }
-                                        action_row
-                                    }
-                                )
-                            );    
-                        }
+                        answer.set_buttons(message.buttons);
                         answer
                     })
-            })
-            .await)
-            .context("Command create response failed")?;
+            }).await)
+        .context("Command create response failed")?;
         Ok(command.get_interaction_response(self).await?)
+    }
+
+    async fn edit_response(&self, command: &Command, message: MessageBuilder) -> Result<()> {
+        (command
+            .create_interaction_response(self, |response| {
+                response.kind(UpdateMessage)
+                .interaction_response_data(|answer| {
+                    answer.allowed_mentions(|mentions| mentions.empty_users());
+                    answer.content(message.content);
+                    message.files.iter().for_each(|Attachment { file, filename }| {
+                        answer.add_file((file.as_slice(), filename.as_str()));
+                    });
+                    answer.set_buttons(message.buttons);
+                    answer
+                })
+            }).await)
+        .context("Command edit message response failed")?;
+        Ok(())
     }
 
     async fn followup(&self, command: &Command, message: MessageBuilder) -> Result<()> {
@@ -68,23 +71,7 @@ impl Bot for Http {
                 message.files.iter().for_each(|Attachment { file, filename }| {
                     answer.add_file((file.as_slice(), filename.as_str()));
                 });
-                if message.buttons.len() > 0 {
-                    answer.components(
-                        |components| components.create_action_row(
-                            |action_row|  {
-                                for button in message.buttons {
-                                    action_row.create_button(
-                                        |b| b
-                                            .custom_id(button.custom_id)
-                                            .style(button.style)
-                                            .label(button.label)
-                                    );
-                                }
-                                action_row
-                            }
-                        )
-                    );    
-                }
+                answer.set_buttons(message.buttons);
                 answer
             })
             .await)
@@ -101,23 +88,7 @@ impl Bot for Http {
                     message.files.iter().for_each(|Attachment { file, filename }| {
                         answer.add_file((file.as_slice(), filename.as_str()));
                     });
-                    if message.buttons.len() > 0 {
-                        answer.components(
-                            |components| components.create_action_row(
-                                |action_row|  {
-                                    for button in message.buttons {
-                                        action_row.create_button(
-                                            |b| b
-                                                .custom_id(button.custom_id)
-                                                .style(button.style)
-                                                .label(button.label)
-                                        );
-                                    }
-                                    action_row
-                                }
-                            )
-                        );    
-                    }
+                    answer.set_buttons(message.buttons);
                     answer
                 }
             ).await).context("Failed to send message")?

@@ -1,4 +1,4 @@
-use serenity::model::application::component::ButtonStyle;
+use serenity::{model::application::component::ButtonStyle, builder::{CreateMessage, CreateInteractionResponseFollowup, CreateInteractionResponseData}};
 
 pub struct Attachment {
     pub file: Vec<u8>,
@@ -35,6 +35,79 @@ impl MessageBuilder {
     
     pub fn buttons(mut self, buttons: Vec<Button>) -> Self {
         self.buttons = buttons;
+        self
+    }
+}
+
+pub trait MessageUtil {
+    fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self;
+}
+
+impl MessageUtil for CreateMessage<'_> {
+    fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self {
+        if buttons.len() > 0 {
+            self.components(
+                |components| components.create_action_row(
+                    |action_row|  {
+                        for button in buttons {
+                            action_row.create_button(
+                                |b| b
+                                    .custom_id(button.custom_id)
+                                    .style(button.style)
+                                    .label(button.label)
+                            );
+                        }
+                        action_row
+                    }
+                )
+            );
+        }
+        self
+    }
+}
+
+impl MessageUtil for CreateInteractionResponseData<'_> {
+    fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self {
+        if buttons.len() > 0 {
+            self.components(
+                |components| components.create_action_row(
+                    |action_row|  {
+                        for button in buttons {
+                            action_row.create_button(
+                                |b| b
+                                    .custom_id(button.custom_id)
+                                    .style(button.style)
+                                    .label(button.label)
+                            );
+                        }
+                        action_row
+                    }
+                )
+            );
+        }
+        self
+    }
+}
+
+impl MessageUtil for CreateInteractionResponseFollowup<'_> {
+    fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self {
+        if buttons.len() > 0 {
+            self.components(
+                |components| components.create_action_row(
+                    |action_row|  {
+                        for button in buttons {
+                            action_row.create_button(
+                                |b| b
+                                    .custom_id(button.custom_id)
+                                    .style(button.style)
+                                    .label(button.label)
+                            );
+                        }
+                        action_row
+                    }
+                )
+            );
+        }
         self
     }
 }
