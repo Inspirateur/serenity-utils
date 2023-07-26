@@ -15,7 +15,8 @@ pub struct Button {
 pub struct MessageBuilder {
     pub content: String,
     pub files: Vec<Attachment>,
-    pub buttons: Vec<Button>
+    pub buttons: Vec<Button>,
+    pub ephemeral: bool,
 }
 
 impl MessageBuilder {
@@ -35,6 +36,11 @@ impl MessageBuilder {
     
     pub fn buttons(mut self, buttons: Vec<Button>) -> Self {
         self.buttons = buttons;
+        self
+    }
+
+    pub fn ephemeral(mut self, ephemeral: bool) -> Self {
+        self.ephemeral = ephemeral;
         self
     }
 }

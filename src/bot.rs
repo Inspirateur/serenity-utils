@@ -32,6 +32,7 @@ impl BotUtil for Http {
                 response
                     .kind(ChannelMessageWithSource)
                     .interaction_response_data(|answer| {
+                        answer.ephemeral(message.ephemeral);
                         answer.allowed_mentions(|mentions| mentions.empty_users());
                         answer.content(message.content);
                         message.files.iter().for_each(|Attachment { file, filename }| {
@@ -66,6 +67,7 @@ impl BotUtil for Http {
     async fn followup(&self, command: &Command, message: MessageBuilder) -> Result<()> {
         (command
             .create_followup_message(self, |answer| {
+                answer.ephemeral(message.ephemeral);
                 answer.allowed_mentions(|mentions| mentions.empty_users());
                 answer.content(message.content);
                 message.files.iter().for_each(|Attachment { file, filename }| {
