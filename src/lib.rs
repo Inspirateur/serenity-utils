@@ -5,6 +5,7 @@ mod utils;
 mod dbmap;
 pub use dbmap::*;
 pub use message::*;
+pub use bot_util::*;
 pub use command_util::*;
 pub use utils::*;
 
