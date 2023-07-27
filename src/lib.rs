@@ -1,10 +1,11 @@
 mod message;
-mod bot;
+mod bot_util;
+mod command_util;
 mod utils;
 mod dbmap;
 pub use dbmap::*;
 pub use message::*;
-pub use bot::*;
+pub use command_util::*;
 pub use utils::*;
 
 #[cfg(test)]
