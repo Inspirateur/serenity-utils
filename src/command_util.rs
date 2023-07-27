@@ -30,6 +30,7 @@ impl CommandUtil for ApplicationCommandInteraction {
                 response
                     .kind(kind)
                     .interaction_response_data(|answer| {
+                        answer.ephemeral(message.ephemeral);
                         answer.allowed_mentions(|mentions| mentions.empty_users());
                         answer.content(message.content);
                         message.files.iter().for_each(|Attachment { file, filename }| {
@@ -46,6 +47,7 @@ impl CommandUtil for ApplicationCommandInteraction {
     async fn followup(&self, http: &Http, message: MessageBuilder) -> Result<()> {
         (self
             .create_followup_message(http, |answer| {
+                answer.ephemeral(message.ephemeral);
                 answer.allowed_mentions(|mentions| mentions.empty_users());
                 answer.content(message.content);
                 message.files.iter().for_each(|Attachment { file, filename }| {
