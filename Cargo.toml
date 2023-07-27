@@ -1,6 +1,6 @@
 [package]
 name = "serenity-utils"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 description = "A collection of utilities that I often need when using Serenity to make discord bot."
 license = "Unlicense"

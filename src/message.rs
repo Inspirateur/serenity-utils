@@ -1,4 +1,4 @@
-use serenity::{model::application::component::ButtonStyle, builder::{CreateMessage, CreateInteractionResponseFollowup, CreateInteractionResponseData}};
+use serenity::{model::application::component::ButtonStyle, builder::{CreateMessage, CreateInteractionResponseFollowup, CreateInteractionResponseData, EditMessage}};
 
 pub struct Attachment {
     pub file: Vec<u8>,
@@ -96,6 +96,29 @@ impl MessageUtil for CreateInteractionResponseData<'_> {
 }
 
 impl MessageUtil for CreateInteractionResponseFollowup<'_> {
+    fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self {
+        if buttons.len() > 0 {
+            self.components(
+                |components| components.create_action_row(
+                    |action_row|  {
+                        for button in buttons {
+                            action_row.create_button(
+                                |b| b
+                                    .custom_id(button.custom_id)
+                                    .style(button.style)
+                                    .label(button.label)
+                            );
+                        }
+                        action_row
+                    }
+                )
+            );
+        }
+        self
+    }
+}
+
+impl MessageUtil for EditMessage<'_> {
     fn set_buttons(&mut self, buttons: Vec<Button>) -> &mut Self {
         if buttons.len() > 0 {
             self.components(
