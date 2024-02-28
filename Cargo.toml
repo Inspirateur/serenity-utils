@@ -21,4 +21,3 @@ serenity = { version = "*", default-features = false, features = [
 	"rustls_backend",
 ] }
 anyhow = "*"
-rusqlite = { version = "*", features = ["bundled"] }
